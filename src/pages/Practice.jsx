@@ -35,12 +35,12 @@ function Practice() {
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
-        ...previousChats,
         {
           role: "system",
           content:
             "You are my conversation partner. Let's engage in a conversation adapted to my language level. Detect the input language and assist in correcting any mistakes.",
         },
+        ...previousChats,
         { role: "user", content: inputText },
       ],
       temperature: 1,
