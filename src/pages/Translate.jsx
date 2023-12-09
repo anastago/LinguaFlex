@@ -44,7 +44,7 @@ function Translate() {
       messages: [
         {
           role: "system",
-          content: `Translate the given phrase from ${inputLanguage} into ${outputLanguage} and consider previous messages, only for context.`,
+          content: `Only translate from ${inputLanguage} into ${outputLanguage}.`,
         },
         ...previousChats,
         { role: "user", content: inputText },
@@ -139,7 +139,7 @@ function Translate() {
       </form>
 
       <div className="translation">{chatResponse}</div>
-      <div>Copied to clipboard</div>
+      {/* <div>Copied to clipboard</div> */}
     </div>
   )
 }
