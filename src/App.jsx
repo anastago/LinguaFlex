@@ -8,9 +8,10 @@ import { useEffect, useRef, useState } from "react"
 
 function App() {
   useEffect(() => {
-    document.body.classList.add("bg-gradient-to-r")
-    document.body.classList.add("from-cyan-500")
-    document.body.classList.add("to-blue-500")
+    document.body.classList.add("bg-blue-50")
+
+    // document.body.classList.add("from-cyan-500")
+    // document.body.classList.add("to-blue-500")
   }, [])
   return (
     <div>
