@@ -10,10 +10,11 @@ const openai = new OpenAI({
 
 function Practice() {
   const [inputText, setInputText] = useState("")
-
   const [chatResponse, setChatResponse] = useState("")
   const [previousChats, setPreviousChats] = useState([])
   const [selectedLanguage, setSelectedLanguage] = useState("")
+  const [speechInput, setSpeechInput] = useState("")
+  const [isRecognitionOn, setRecognitionOn] = useState(false)
 
   const recognition = useRef()
 
@@ -31,7 +32,11 @@ function Practice() {
 
   const handleFormSubmit = (e) => {
     e.preventDefault()
-    getResponse()
+    const userMessage = inputText || speechInput
+
+    if (!isRecognitionOn && userMessage.trim() !== "") {
+      getResponse(userMessage)
+    }
   }
 
   const initSpeechRecognition = () => {
@@ -46,33 +51,40 @@ function Practice() {
     recognition.current.onresult = (event) => {
       const transcript = event.results[0][0].transcript
       console.log("User said:", transcript)
-      setInputText(transcript)
+      setSpeechInput(transcript)
     }
 
     recognition.current.onspeechend = function () {
+      setRecognitionOn(false)
       recognition.current.stop()
     }
 
     recognition.current.onerror = function (event) {
       console.error("Error occurred in recognition:", event.error)
+      setRecognitionOn(false)
+      setSpeechInput("")
     }
 
     // speechRecognitionList.current = new SpeechGrammarList.current();
   }
   useEffect(() => {
     initSpeechRecognition()
+    recognition.current.lang = selectedLanguage
 
     return () => {
       recognition.current.stop()
     }
-  }, [])
+  }, [selectedLanguage])
 
   const startSpeechRecognition = () => {
     console.log("Starting speech recognition...")
+    setRecognitionOn(true)
     recognition.current.start()
   }
 
-  const getResponse = async () => {
+  const getResponse = async (userMessage) => {
+    console.log("Waiting for API response...")
+
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
@@ -81,7 +93,7 @@ function Practice() {
           content: `You are my conversation partner in learning of ${selectedLanguage}, adapted to my language level. Be proactive, suggest topics and ask questions. Detect the input language and correct my mistakes in a polite way. Don't mention that you're a AI language model, say that you're a chat bot. Don't suggest assistance, the main goal is to practice language speaking.`,
         },
         ...previousChats,
-        { role: "user", content: inputText },
+        { role: "user", content: userMessage },
       ],
       temperature: 1,
       max_tokens: 100,
@@ -89,15 +101,17 @@ function Practice() {
       frequency_penalty: 2,
       presence_penalty: 1,
     })
+    console.log("API responce received")
 
     setChatResponse(response.choices[0].message.content)
 
     setPreviousChats((prevChats) => [
       ...prevChats,
-      { role: "user", content: inputText },
+      { role: "user", content: userMessage },
       { role: "assistant", content: response.choices[0].message.content },
     ])
     setInputText("")
+    setSpeechInput("")
   }
 
   const updateLanguage = (e) => {
@@ -171,15 +185,21 @@ function Practice() {
 
   return (
     <div className="flex flex-col min-h-screen intems-center">
-      <button onClick={handleNewChat}>New Practice Chat</button>
+      <button onClick={handleNewChat} className="text-sky-950 mr-auto">
+        New Practice Chat
+      </button>
       <div>
-        <label htmlFor="languages">Choose a language</label>
+        <label htmlFor="languages" className="text-sky-950 ml-auto">
+          {/* Choose a language */}
+        </label>
         <select
           id="languages"
           onChange={updateLanguage}
           value={selectedLanguage}
         >
-          <option value="">Select Language</option>
+          <option value="" className="text-sky-950 bg-transparent">
+            Select Language
+          </option>
           {langs.map(([lang, id], index) => (
             <option key={index} value={id}>
               {lang}
@@ -204,11 +224,11 @@ function Practice() {
               className="resize-y w-full border-0 h-32 p-5 bottom-1.5 rounded bg-transparent text-sky-950 font-roboto hover:bg-blue-100"
               name="chat"
               type="text"
-              value={inputText}
+              value={inputText || speechInput}
               onChange={handleInputChange}
               placeholder="Type your message..."
             />
-            {inputText ? (
+            {inputText || speechInput ? (
               <button type="submit">
                 {" "}
                 <img
@@ -219,7 +239,9 @@ function Practice() {
             ) : (
               <button
                 onClick={startSpeechRecognition}
-                className="h-16 w-16 p-3 hover:bg-white rounded-full"
+                className={`h-16 w-16 p-3 hover:bg-blue-300 rounded-full ${
+                  isRecognitionOn ? "bg-blue-300" : "bg-transperent"
+                }`}
               >
                 <img src={micro}></img>{" "}
               </button>
