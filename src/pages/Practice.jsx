@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react"
 import { OpenAI } from "openai"
 import micro from "../assets/microphone-2-svgrepo-com.svg"
 import send from "../assets/send-alt-1-svgrepo-com.svg"
+import Navbar from "../components/Navbar"
+import TextareaAutosize from "react-textarea-autosize"
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -15,6 +17,8 @@ function Practice() {
   const [selectedLanguage, setSelectedLanguage] = useState("")
   const [speechInput, setSpeechInput] = useState("")
   const [isRecognitionOn, setRecognitionOn] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [userMessage, setUserMessage] = useState("")
 
   const recognition = useRef()
 
@@ -30,12 +34,19 @@ function Practice() {
     setSelectedLanguage("")
   }
 
+  useEffect(() => {
+    if (!isRecognitionOn && userMessage) {
+      getResponse(userMessage)
+    }
+  }, [isRecognitionOn, userMessage])
+
   const handleFormSubmit = (e) => {
     e.preventDefault()
-    const userMessage = inputText || speechInput
+    const message =
+      (inputText && inputText.trim()) || (speechInput && speechInput.trim())
 
-    if (!isRecognitionOn && userMessage.trim() !== "") {
-      getResponse(userMessage)
+    if (!isRecognitionOn && message) {
+      setUserMessage(message)
     }
   }
 
@@ -84,6 +95,7 @@ function Practice() {
 
   const getResponse = async (userMessage) => {
     console.log("Waiting for API response...")
+    setIsLoading(true)
 
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -102,6 +114,7 @@ function Practice() {
       presence_penalty: 1,
     })
     console.log("API responce received")
+    setIsLoading(false)
 
     setChatResponse(response.choices[0].message.content)
 
@@ -112,6 +125,8 @@ function Practice() {
     ])
     setInputText("")
     setSpeechInput("")
+    setUserMessage("")
+    console.log(previousChats)
   }
 
   const updateLanguage = (e) => {
@@ -184,68 +199,78 @@ function Practice() {
   ]
 
   return (
-    <div className="flex flex-col min-h-screen intems-center">
-      <button onClick={handleNewChat} className="text-sky-950 mr-auto">
+    <div className="flex flex-col h-screen">
+      <Navbar></Navbar>
+      {/* <button onClick={handleNewChat} className="text-sky-950 mr-auto">
         New Practice Chat
-      </button>
-      <div>
-        <label htmlFor="languages" className="text-sky-950 ml-auto">
-          {/* Choose a language */}
-        </label>
-        <select
-          id="languages"
-          onChange={updateLanguage}
-          value={selectedLanguage}
-        >
-          <option value="" className="text-sky-950 bg-transparent">
-            Select Language
-          </option>
-          {langs.map(([lang, id], index) => (
-            <option key={index} value={id}>
-              {lang}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="p-2 w-3/5 border m-auto rounded bg-transparent text-sky-950 font-roboto">
-        <div className="flex-col-reverse min-h-full">
+      </button> */}
+
+      <div className="flex flex-col overflow-hidden flex-1 w-3/5 border m-auto rounded bg-transparent text-sky-950 font-roboto">
+        <div className="flex-col-reverse overflow-y-auto flex-1 text-left">
           {previousChats.map((chat, index) => (
-            <div
-              key={index}
-              className={chat.role === "assistant" ? "assistant" : "user"}
-            >
-              {chat.content}
+            <div key={index} className="">
+              {chat.role === "user" && (
+                <span className="p-0-1">{chat.content}</span>
+              )}
+              {chat.role === "assistant" && (
+                <span className="p-0-1">{chat.content}</span>
+              )}
             </div>
           ))}
+          {userMessage && <div>{userMessage}</div>}
+          {isLoading && <div>Thinking...</div>}
         </div>
-        <div>
-          <form onSubmit={handleFormSubmit}>
-            <textarea
-              className="resize-y w-full border-0 h-32 p-5 bottom-1.5 rounded bg-transparent text-sky-950 font-roboto hover:bg-blue-100"
+        <div className="w-full">
+          <div className="">
+            <label htmlFor="languages" className="text-sky-950">
+              {/* Choose a language */}
+            </label>
+            <select
+              id="languages"
+              onChange={updateLanguage}
+              value={selectedLanguage}
+            >
+              <option value="" className="text-sky-950 bg-transparent">
+                Detect Language
+              </option>
+              {langs.map(([lang, id], index) => (
+                <option key={index} value={id}>
+                  {lang}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <form onSubmit={handleFormSubmit} className="">
+            <TextareaAutosize
+              autoFocus
+              className="resize-none outline-none overflow-y-hidden w-full border-0 h-16 rounded bg-transparent text-sky-950 font-roboto hover:bg-blue-100"
               name="chat"
               type="text"
               value={inputText || speechInput}
               onChange={handleInputChange}
-              placeholder="Type your message..."
+              placeholder="Write your message..."
             />
-            {inputText || speechInput ? (
-              <button type="submit">
-                {" "}
-                <img
-                  src={send}
-                  className="h-16 w-16 p-3 hover:bg-white rounded-full"
-                ></img>{" "}
-              </button>
-            ) : (
-              <button
-                onClick={startSpeechRecognition}
-                className={`h-16 w-16 p-3 hover:bg-blue-300 rounded-full ${
-                  isRecognitionOn ? "bg-blue-300" : "bg-transperent"
-                }`}
-              >
-                <img src={micro}></img>{" "}
-              </button>
-            )}
+            <div className="flex justify-end p-1">
+              {inputText || speechInput ? (
+                <button type="submit">
+                  {" "}
+                  <img
+                    src={send}
+                    className="h-16 w-16 p-3 hover:bg-white rounded-full"
+                  ></img>{" "}
+                </button>
+              ) : (
+                <button
+                  onClick={startSpeechRecognition}
+                  className={`h-16 w-16 p-3 hover:bg-blue-300 rounded-full ${
+                    isRecognitionOn ? "bg-blue-300" : "bg-transperent"
+                  }`}
+                >
+                  <img src={micro}></img>{" "}
+                </button>
+              )}
+            </div>
           </form>
         </div>
       </div>
