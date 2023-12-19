@@ -4,6 +4,7 @@ import micro from "../assets/microphone-2-svgrepo-com.svg"
 import send from "../assets/send-alt-1-svgrepo-com.svg"
 import Navbar from "../components/Navbar"
 import TextareaAutosize from "react-textarea-autosize"
+import { Link } from "react-router-dom"
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -200,13 +201,41 @@ function Practice() {
 
   return (
     <div className="flex flex-col h-screen">
-      <Navbar></Navbar>
-      {/* <button onClick={handleNewChat} className="text-sky-950 mr-auto">
-        New Practice Chat
-      </button> */}
-
-      <div className="flex flex-col overflow-hidden flex-1 w-3/5 border m-auto rounded bg-transparent text-sky-950 font-roboto">
-        <div className="flex-col-reverse overflow-y-auto flex-1 text-left">
+      <div className="sticky top-2 p-2 m-2 h-12 flex font-roboto justify-between text-sky-950">
+        {" "}
+        <button
+          onClick={handleNewChat}
+          className="w-36 h-12 hover:bg-blue-100 rounded-full p-3 text-center"
+        >
+          New Chat
+        </button>
+        <Link className="w-36 h-12 hover:bg-blue-100 rounded-full p-3 text-center">
+          About
+        </Link>
+      </div>
+      {/* <div className="flex flex-col flex-1"></div> */}
+      <div className="flex flex-col overflow-hidden flex-1 w-3/5 s m-auto border rounded bg-transparent text-sky-950 font-roboto relative bottom-10">
+        <div className="m-auto">
+          <label htmlFor="languages" className="">
+            {/* Choose a language */}
+          </label>
+          <select
+            className="w-52 h-12 bg-blue-50 hover:bg-blue-100 rounded-full p-3 text-center appearance-none"
+            id="languages"
+            onChange={updateLanguage}
+            value={selectedLanguage}
+          >
+            <option value="" className="text-sky-950 bg-transparent">
+              Detect Language
+            </option>
+            {langs.map(([lang, id], index) => (
+              <option key={index} value={id}>
+                {lang}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex-col-reverse overflow-y-auto flex-1 text-left relative">
           {previousChats.map((chat, index) => (
             <div key={index} className="">
               {chat.role === "user" && (
@@ -220,34 +249,14 @@ function Practice() {
           {userMessage && <div>{userMessage}</div>}
           {isLoading && <div>Thinking...</div>}
         </div>
-        <div className="w-full">
-          <div className="">
-            <label htmlFor="languages" className="text-sky-950">
-              {/* Choose a language */}
-            </label>
-            <select
-              id="languages"
-              onChange={updateLanguage}
-              value={selectedLanguage}
-            >
-              <option value="" className="text-sky-950 bg-transparent">
-                Detect Language
-              </option>
-              {langs.map(([lang, id], index) => (
-                <option key={index} value={id}>
-                  {lang}
-                </option>
-              ))}
-            </select>
-          </div>
-
+        <div className="w-full sticky overflow-y-hidden">
           <form
             onSubmit={handleFormSubmit}
-            className="flex w-full justify-end items-center sticky bottom-36"
+            className="flex w-full justify-end items-center sticky border rounded-full"
           >
             <TextareaAutosize
               autoFocus
-              className="flex-1 resize-none outline-none overflow-y-hidden border-0 rounded bg-transparent text-sky-950 font-roboto hover:bg-blue-100"
+              className="flex-1 p-1 resize-none outline-none overflow-y-hidden border-0 rounded bg-transparent text-sky-950 font-roboto"
               name="chat"
               type="text"
               value={inputText || speechInput}
