@@ -241,36 +241,38 @@ function Practice() {
             </select>
           </div>
 
-          <form onSubmit={handleFormSubmit} className="">
+          <form
+            onSubmit={handleFormSubmit}
+            className="flex w-full justify-end items-center sticky bottom-36"
+          >
             <TextareaAutosize
               autoFocus
-              className="resize-none outline-none overflow-y-hidden w-full border-0 h-16 rounded bg-transparent text-sky-950 font-roboto hover:bg-blue-100"
+              className="flex-1 resize-none outline-none overflow-y-hidden border-0 rounded bg-transparent text-sky-950 font-roboto hover:bg-blue-100"
               name="chat"
               type="text"
               value={inputText || speechInput}
               onChange={handleInputChange}
               placeholder="Write your message..."
             />
-            <div className="flex justify-end p-1">
-              {inputText || speechInput ? (
-                <button type="submit">
-                  {" "}
-                  <img
-                    src={send}
-                    className="h-16 w-16 p-3 hover:bg-white rounded-full"
-                  ></img>{" "}
-                </button>
-              ) : (
-                <button
-                  onClick={startSpeechRecognition}
-                  className={`h-16 w-16 p-3 hover:bg-blue-300 rounded-full ${
-                    isRecognitionOn ? "bg-blue-300" : "bg-transperent"
-                  }`}
-                >
-                  <img src={micro}></img>{" "}
-                </button>
-              )}
-            </div>
+
+            {inputText || speechInput ? (
+              <button type="submit">
+                {" "}
+                <img
+                  src={send}
+                  className="h-16 w-16 p-3 hover:bg-white rounded-full"
+                ></img>{" "}
+              </button>
+            ) : (
+              <button
+                onClick={startSpeechRecognition}
+                className={`h-16 w-16 p-3 hover:bg-blue-300 rounded-full ${
+                  isRecognitionOn ? "bg-blue-300" : "bg-transperent"
+                }`}
+              >
+                <img src={micro}></img>{" "}
+              </button>
+            )}
           </form>
         </div>
       </div>
