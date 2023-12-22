@@ -11,15 +11,11 @@ function App() {
   useEffect(() => {
     document.body.classList.add("bg-blue-50")
     document.body.classList.add("box-border")
-
-    // document.body.classList.add("from-cyan-500")
-    // document.body.classList.add("to-blue-500")
   }, [])
   return (
     <div className="min-w-[320px]">
       <Helmet>
         <title>LinguaFlex</title>
-        <meta property="og:image" content=""></meta>
       </Helmet>
       <Routes>
         <Route path="/" element={<Homepage />} />
