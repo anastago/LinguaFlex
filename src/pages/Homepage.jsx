@@ -8,7 +8,7 @@ function Homepage(props) {
       <Navbar></Navbar>
       <div className="flex flex-col h-screen items-center justify-around content-center">
         <div className="flex flex-col items-center justify-center w-4/5 text-blue-800 font-roboto text-center">
-          <h1 className="text-6xl font-roboto py-3 drop-shadow-lg">
+          <h1 className="text-6xl font-roboto py-3">
             Empower Your Language Fluency
           </h1>
 

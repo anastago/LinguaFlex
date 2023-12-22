@@ -6,9 +6,9 @@ function About() {
     <div className="flex flex-col h-screen box-border">
       <Navbar />
       <div className="flex flex-col items-center justify-center">
-        <div className="flex flex-col w-3/5 text-blue-800 font-roboto text-center">
+        <div className="flex flex-col gap-10 max-w-3xl text-blue-800 font-roboto text-left mx-5 mb-32">
           <div className="">
-            <h1 className="text-3xl font-roboto py-3 drop-shadow-lg my-4">
+            <h1 className="text-3xl font-roboto py-3 drop-shadow-lg mb-4">
               LinguaFlex: <div>Your Personal Language Companion</div>
             </h1>
             <div className="">
@@ -21,7 +21,7 @@ function About() {
             </div>
           </div>
           <div>
-            <h1 className="text-3xl font-roboto py-3 drop-shadow-lg my-4">
+            <h1 className="text-3xl font-roboto py-3 drop-shadow-lg mb-4">
               Practice Language with an AI Chat
             </h1>{" "}
             <div>
@@ -34,16 +34,20 @@ function About() {
             </div>
           </div>
           <div className="">
-            <h1 className="text-3xl font-roboto py-3 drop-shadow-lg my-4">
+            <h1 className="text-3xl font-roboto py-3 drop-shadow-lg mb-4">
               About the Creator
             </h1>
-            LinguaFlex is the brainchild of anastago, a passionate language
-            enthusiast. Anastago, a Russian living in France, has been driven by
-            a lifelong love for languages. The inspiration behind LinguaFlex
-            comes from the desire to bridge linguistic gaps and facilitate
-            communication among friends and family members speaking different
-            languages. Anastago's vision is to create a tool that not only
-            teaches languages but fosters understanding and connection.
+            Hey! I am{" "}
+            <a className="text-blue-500" href="https://github.com/anastago">
+              {" "}
+              anastago
+            </a>
+            , a passionate language enthusiast. A Russian living in France, I've
+            been driven by a lifelong love for languages. The inspiration behind
+            LinguaFlex comes from the desire to bridge linguistic gaps and
+            facilitate communication among friends and family members speaking
+            different languages. I wanted to create a tool that not only teaches
+            languages but fosters understanding and connection.
           </div>
         </div>
       </div>

@@ -7,6 +7,8 @@ import { Link } from "react-router-dom"
 import { MicrophoneIcon } from "@heroicons/react/24/outline"
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline"
 import { ChevronDownIcon } from "@heroicons/react/24/outline"
+import { UserCircleIcon } from "@heroicons/react/24/outline"
+import { FaceSmileIcon } from "@heroicons/react/24/outline"
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -18,7 +20,6 @@ function Practice() {
   const [chatResponse, setChatResponse] = useState("")
   const [previousChats, setPreviousChats] = useState([])
   const [selectedLanguage, setSelectedLanguage] = useState("")
-  const [speechInput, setSpeechInput] = useState("")
   const [isRecognitionOn, setRecognitionOn] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [userMessage, setUserMessage] = useState("")
@@ -45,8 +46,8 @@ function Practice() {
 
   const handleFormSubmit = (e) => {
     e.preventDefault()
-    const message =
-      (inputText && inputText.trim()) || (speechInput && speechInput.trim())
+    setInputText("")
+    const message = inputText && inputText.trim()
 
     if (!isRecognitionOn && message) {
       setUserMessage(message)
@@ -57,15 +58,12 @@ function Practice() {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition
 
-    // SpeechRecognitionEvent.current =
-    //   window.SpeechRecognitionEvent || webkitSpeechRecognitionEvent
-
     recognition.current = new SpeechRecognition()
 
     recognition.current.onresult = (event) => {
       const transcript = event.results[0][0].transcript
       console.log("User said:", transcript)
-      setSpeechInput(transcript)
+      setInputText(transcript)
     }
 
     recognition.current.onspeechend = function () {
@@ -76,10 +74,8 @@ function Practice() {
     recognition.current.onerror = function (event) {
       console.error("Error occurred in recognition:", event.error)
       setRecognitionOn(false)
-      setSpeechInput("")
+      setInputText("")
     }
-
-    // speechRecognitionList.current = new SpeechGrammarList.current();
   }
   useEffect(() => {
     initSpeechRecognition()
@@ -126,8 +122,7 @@ function Practice() {
       { role: "user", content: userMessage },
       { role: "assistant", content: response.choices[0].message.content },
     ])
-    setInputText("")
-    setSpeechInput("")
+
     setUserMessage("")
     console.log(previousChats)
   }
@@ -206,7 +201,7 @@ function Practice() {
       <div className="sticky p-2 h-14 flex font-roboto justify-between text-sky-950">
         <button
           onClick={handleNewChat}
-          className="w-36 h-12 hover:bg-blue-100 rounded-full p-3 text-center drop-shadow-lg"
+          className="w-36 h-12 hover:bg-blue-100 rounded-full p-3 text-center drop-shadow-lg whitespace-nowrap"
         >
           New Chat
         </button>
@@ -226,7 +221,7 @@ function Practice() {
               </option>
             ))}
           </select>
-          <ChevronDownIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-6 " />
+          <ChevronDownIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-6" />
         </div>
         <Link
           to="/about"
@@ -235,20 +230,28 @@ function Practice() {
           About
         </Link>
       </div>
-      {/* <div className="flex flex-col flex-1"></div> */}
-      <div className="flex flex-col overflow-hidden flex-1 w-3/5 m-auto rounded text-sky-950 font-roboto">
-        <div className="flex flex-col overflow-y-auto flex-1 text-left gap-6 pb-8">
+
+      <div className="flex flex-col overflow-hidden flex-1 max-w-3xl w-full mx-auto px-5 m-auto rounded text-sky-950 font-roboto">
+        <div className="flex flex-col overflow-y-auto flex-1 text-left gap-6 pb-8 mt-10">
           {previousChats.map((chat, index) => (
             <div key={index} className="">
               {chat.role === "user" && (
-                <div className="p-0-1">{chat.content}</div>
+                <div className="p-0-1 flex flex-col gap-2 items-start">
+                  <div className="text-blue-800">You</div>
+                  {chat.content}
+                </div>
               )}
               {chat.role === "assistant" && (
-                <div className="p-0-1">{chat.content}</div>
+                <div className="p-0-1 flex flex-col gap-2 items-start">
+                  <div className="text-sky-500">LinguaFlex</div>
+                  {chat.content}
+                </div>
               )}
             </div>
           ))}
+
           {userMessage && <div>{userMessage}</div>}
+
           {isLoading && <div className="text-slate-500">Thinking...</div>}
         </div>
         <div className="w-full sticky">
@@ -261,12 +264,12 @@ function Practice() {
               className="flex-1 px-6 h-16 resize-none outline-none border-0 rounded bg-transparent text-sky-950 font-roboto"
               name="chat"
               type="text"
-              value={inputText || speechInput}
+              value={inputText}
               onChange={handleInputChange}
               placeholder="Write your message..."
             />
 
-            {inputText || speechInput ? (
+            {inputText ? (
               <button
                 type="submit"
                 className="h-16 w-16 hover:bg-blue-100 rounded-full flex items-center justify-center "

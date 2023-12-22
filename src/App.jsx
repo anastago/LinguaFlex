@@ -16,7 +16,7 @@ function App() {
     // document.body.classList.add("to-blue-500")
   }, [])
   return (
-    <div>
+    <div className="min-w-[320px]">
       <Helmet>
         <title>LinguaFlex</title>
         <meta property="og:image" content=""></meta>
