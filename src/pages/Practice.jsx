@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from "react"
 import { OpenAI } from "openai"
 
-import Navbar from "../components/Navbar"
 import TextareaAutosize from "react-textarea-autosize"
 import { Link } from "react-router-dom"
 import { MicrophoneIcon } from "@heroicons/react/24/outline"
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline"
 import { ChevronDownIcon } from "@heroicons/react/24/outline"
-import { UserCircleIcon } from "@heroicons/react/24/outline"
-import { FaceSmileIcon } from "@heroicons/react/24/outline"
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -51,6 +48,10 @@ function Practice() {
 
     if (!isRecognitionOn && message) {
       setUserMessage(message)
+      setPreviousChats((prevChats) => [
+        ...prevChats,
+        { role: "user", content: message },
+      ])
     }
   }
 
@@ -97,17 +98,17 @@ function Practice() {
     setIsLoading(true)
 
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
-          content: `You are my conversation partner in learning of ${selectedLanguage}, adapted to my language level. Be proactive, suggest topics and ask questions. Detect the input language and always correct my mistakes, tell me how the phrases should've been structured, do it in a polite way. If in my texts there are mistakes or typos, always correct it. Say that you're a chat bot, do not mention that you're a AI language model. Don't suggest assistance, the main goal is to practice language speaking.`,
+          content: `You're my language learning partner, focusing on the ${selectedLanguage}. If the language is not chosen, detect it. Be proactive: suggest topics, ask questions, correct mistakes politely. Don't ask more than 2 questions in response. If you find errors or typos responses, provide corrections. Identify as a chat bot and avoid mentioning that you're an AI language model, don't suggest assistance. The goal is to practice speaking.`,
         },
         ...previousChats,
         { role: "user", content: userMessage },
       ],
       temperature: 1,
-      max_tokens: 100,
+      max_tokens: 120,
       top_p: 1,
       frequency_penalty: 2,
       presence_penalty: 1,
@@ -119,7 +120,6 @@ function Practice() {
 
     setPreviousChats((prevChats) => [
       ...prevChats,
-      { role: "user", content: userMessage },
       { role: "assistant", content: response.choices[0].message.content },
     ])
 
@@ -249,8 +249,6 @@ function Practice() {
               )}
             </div>
           ))}
-
-          {userMessage && <div>{userMessage}</div>}
 
           {isLoading && <div className="text-slate-500">Thinking...</div>}
         </div>
