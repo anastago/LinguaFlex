@@ -3,9 +3,9 @@ import { Routes, Route } from "react-router-dom"
 import "./App.css"
 import Homepage from "./pages/Homepage"
 import Practice from "./pages/Practice"
-import Translate from "./pages/Translate"
 import { useEffect, useRef, useState } from "react"
-import Navbar from "./components/Navbar"
+import { Helmet } from "react-helmet"
+import About from "./pages/About"
 
 function App() {
   useEffect(() => {
@@ -17,10 +17,14 @@ function App() {
   }, [])
   return (
     <div>
+      <Helmet>
+        <title>LinguaFlex</title>
+        <meta property="og:image" content=""></meta>
+      </Helmet>
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/practice" element={<Practice />} />
-        <Route path="/translate" element={<Translate />} />
+        <Route path="/about" element={<About />} />
       </Routes>
     </div>
   )

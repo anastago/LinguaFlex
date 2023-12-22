@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react"
 import { OpenAI } from "openai"
-import micro from "../assets/microphone-2-svgrepo-com.svg"
-import send from "../assets/send-alt-1-svgrepo-com.svg"
+
 import Navbar from "../components/Navbar"
 import TextareaAutosize from "react-textarea-autosize"
 import { Link } from "react-router-dom"
+import { MicrophoneIcon } from "@heroicons/react/24/outline"
+import { PaperAirplaneIcon } from "@heroicons/react/24/outline"
+import { ChevronDownIcon } from "@heroicons/react/24/outline"
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -103,7 +105,7 @@ function Practice() {
       messages: [
         {
           role: "system",
-          content: `You are my conversation partner in learning of ${selectedLanguage}, adapted to my language level. Be proactive, suggest topics and ask questions. Detect the input language and correct my mistakes in a polite way. Don't mention that you're a AI language model, say that you're a chat bot. Don't suggest assistance, the main goal is to practice language speaking.`,
+          content: `You are my conversation partner in learning of ${selectedLanguage}, adapted to my language level. Be proactive, suggest topics and ask questions. Detect the input language and always correct my mistakes, tell me how the phrases should've been structured, do it in a polite way. If in my texts there are mistakes or typos, always correct it. Say that you're a chat bot, do not mention that you're a AI language model. Don't suggest assistance, the main goal is to practice language speaking.`,
         },
         ...previousChats,
         { role: "user", content: userMessage },
@@ -200,33 +202,23 @@ function Practice() {
   ]
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="sticky top-2 p-2 m-2 h-12 flex font-roboto justify-between text-sky-950">
-        {" "}
+    <div className="flex flex-col h-screen box-border">
+      <div className="sticky p-2 h-14 flex font-roboto justify-between text-sky-950">
         <button
           onClick={handleNewChat}
-          className="w-36 h-12 hover:bg-blue-100 rounded-full p-3 text-center"
+          className="w-36 h-12 hover:bg-blue-100 rounded-full p-3 text-center drop-shadow-lg"
         >
           New Chat
         </button>
-        <Link className="w-36 h-12 hover:bg-blue-100 rounded-full p-3 text-center">
-          About
-        </Link>
-      </div>
-      {/* <div className="flex flex-col flex-1"></div> */}
-      <div className="flex flex-col overflow-hidden flex-1 w-3/5 s m-auto border rounded bg-transparent text-sky-950 font-roboto relative bottom-10">
-        <div className="m-auto">
-          <label htmlFor="languages" className="">
-            {/* Choose a language */}
-          </label>
+        <div className="m-auto relative">
           <select
-            className="w-52 h-12 bg-blue-50 hover:bg-blue-100 rounded-full p-3 text-center appearance-none"
+            className="w-52 h-12 bg-blue-50 hover:bg-blue-100 rounded-full p-3 text-center appearance-none hover:drop-shadow-lg"
             id="languages"
             onChange={updateLanguage}
             value={selectedLanguage}
           >
             <option value="" className="text-sky-950 bg-transparent">
-              Detect Language
+              Detect Language{" "}
             </option>
             {langs.map(([lang, id], index) => (
               <option key={index} value={id}>
@@ -234,29 +226,39 @@ function Practice() {
               </option>
             ))}
           </select>
+          <ChevronDownIcon className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-6 " />
         </div>
-        <div className="flex-col-reverse overflow-y-auto flex-1 text-left relative">
+        <Link
+          to="/about"
+          className="w-36 h-12 hover:bg-blue-100 rounded-full p-3 text-center drop-shadow-lg"
+        >
+          About
+        </Link>
+      </div>
+      {/* <div className="flex flex-col flex-1"></div> */}
+      <div className="flex flex-col overflow-hidden flex-1 w-3/5 m-auto rounded text-sky-950 font-roboto">
+        <div className="flex flex-col overflow-y-auto flex-1 text-left gap-6 pb-8">
           {previousChats.map((chat, index) => (
             <div key={index} className="">
               {chat.role === "user" && (
-                <span className="p-0-1">{chat.content}</span>
+                <div className="p-0-1">{chat.content}</div>
               )}
               {chat.role === "assistant" && (
-                <span className="p-0-1">{chat.content}</span>
+                <div className="p-0-1">{chat.content}</div>
               )}
             </div>
           ))}
           {userMessage && <div>{userMessage}</div>}
-          {isLoading && <div>Thinking...</div>}
+          {isLoading && <div className="text-slate-500">Thinking...</div>}
         </div>
-        <div className="w-full sticky overflow-y-hidden">
+        <div className="w-full sticky">
           <form
             onSubmit={handleFormSubmit}
-            className="flex w-full justify-end items-center sticky border rounded-full"
+            className="flex w-full justify-end items-center sticky border rounded-full mb-6 -mt-3 shadow-lg bg-white p-1 overflow-hidden"
           >
             <TextareaAutosize
               autoFocus
-              className="flex-1 p-1 resize-none outline-none overflow-y-hidden border-0 rounded bg-transparent text-sky-950 font-roboto"
+              className="flex-1 px-6 h-16 resize-none outline-none border-0 rounded bg-transparent text-sky-950 font-roboto"
               name="chat"
               type="text"
               value={inputText || speechInput}
@@ -265,21 +267,22 @@ function Practice() {
             />
 
             {inputText || speechInput ? (
-              <button type="submit">
+              <button
+                type="submit"
+                className="h-16 w-16 hover:bg-blue-100 rounded-full flex items-center justify-center "
+              >
                 {" "}
-                <img
-                  src={send}
-                  className="h-16 w-16 p-3 hover:bg-white rounded-full"
-                ></img>{" "}
+                <PaperAirplaneIcon className="h-7 w-7 text-blue-800" />
               </button>
             ) : (
               <button
                 onClick={startSpeechRecognition}
-                className={`h-16 w-16 p-3 hover:bg-blue-300 rounded-full ${
+                className={`h-16 w-16 hover:bg-blue-100 rounded-full flex items-center justify-center ${
                   isRecognitionOn ? "bg-blue-300" : "bg-transperent"
                 }`}
               >
-                <img src={micro}></img>{" "}
+                {" "}
+                <MicrophoneIcon className="h-7 w-7 text-blue-800"></MicrophoneIcon>
               </button>
             )}
           </form>
